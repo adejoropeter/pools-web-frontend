@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dennis Moore - Premium Betting Tips</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <!-- Header -->
+    <header>
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <i class="fas fa-dice"></i>
+            <h1>Dennis Moore</h1>
+          </div>
+          <div class="nav-links">
+            <a href="#home">Home</a>
+            <a
+            onclick="showResultsSection(); return false;"
+            href="#results-section"
+
+              >Results</a
+            >
+            <a
+              href="#advert-preview"
+              onclick="showAdvertSection(); return false;"
+              >Advert</a
+            >
+          </div>
+          <div class="auth-buttons" id="auth-buttons">
+            <button
+              class="btn btn-outline"
+              onclick="showLoginForm()"
+              id="admin-login-btn">
+              Admin Login
+            </button>
+            <button
+              class="btn btn-primary"
+              onclick="showRegistration()"
+              id="signup-btn">
+              Sign Up
+            </button>
+            <button
+              class="btn btn-outline"
+              onclick="logout()"
+              id="logout-btn"
+              style="display: none">
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+      <div class="container">
+        <div class="hero-content">
+          <h2 id="hero-title">
+            Professional Betting Tips to Maximize Your Wins
+          </h2>
+          <p id="hero-subtitle">
+            Join thousands of successful bettors who use our expert tips to
+            increase their winning chances. Our experts analyze data and
+            statistics to provide you with the most accurate predictions.
+          </p>
+          <button class="btn btn-primary" onclick="showAdvertSection()">
+            Learn More
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Advert Preview Section -->
+    <section class="advert-preview" id="advert-preview">
+      <div class="container">
+        <div class="section-title">
+          <h2>Weekly Betting Adverts</h2>
+          <p>Discover our latest betting tips and strategies</p>
+        </div>
+        <div class="advert-grid" id="advert-grid">
+          <!-- Advert cards will be dynamically inserted here -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Results Section -->
+    <section class="results" id="results-section">
+      <div class="container">
+        <div class="section-title" id="results-title">
+          <h2>Latest Football Results</h2>
+          <p>Check out the latest match results from the pools</p>
+        </div>
+
+        <!-- Filters -->
+        <div class="results-filters">
+          <select id="date-select" class="form-control">
+            <option value="latest">Latest Week</option>
+          </select>
+          <button
+            class="btn btn-primary"
+            id="but"
+            onclick="fetchAblefastResultsByDate()">
+            Load Results
+          </button>
+        </div>
+
+        <!-- Results Table -->
+        <div class="results-table-container" id="result">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th>S/N</th>
+                <th>Home</th>
+                <th>Away</th>
+                <th>Result</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="results-body">
+              <tr>
+                <td colspan="5" class="loading">Loading latest fixtures...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features-section">
+      <div class="container">
+        <div class="section-title">
+          <h2 id="features-title">Why Choose Our Tips</h2>
+          <p id="features-subtitle">
+            We provide data-driven betting tips with proven success rates across
+            multiple sports
+          </p>
+        </div>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <h3 id="feature-1-title">Data Analysis</h3>
+            <p id="feature-1-desc">
+              Our experts analyze historical data, statistics, and current form
+              to provide accurate predictions.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-percentage"></i>
+            </div>
+            <h3 id="feature-2-title">High Success Rate</h3>
+            <p id="feature-2-desc">
+              We maintain a consistent 75%+ success rate across all our tips,
+              verified by our users.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-users"></i>
+            </div>
+            <h3 id="feature-3-title">Community Support</h3>
+            <p id="feature-3-desc">
+              Join our community of successful bettors and share strategies in
+              our exclusive forum.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Registration Form -->
+    <section class="registration" id="registration">
+      <div class="container">
+        <div class="section-title">
+          <h2 id="reg-title">Ready to Start Winning?</h2>
+          <p id="reg-subtitle">
+            Register now to get exclusive access to our premium betting tips
+          </p>
+        </div>
+        <div class="form-container">
+          <form id="registration-form">
+            <div class="form-group">
+              <label for="name">Full Name</label>
+              <input
+                type="text"
+                id="name"
+                class="form-control"
+                placeholder="Enter your full name"
+                required />
+            </div>
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+              <input
+                type="tel"
+                id="phone"
+                class="form-control"
+                placeholder="Enter your phone number" />
+            </div>
+            <div class="form-group">
+              <label for="sport">Favorite Sport</label>
+              <select id="sport" class="form-control" required>
+                <option value="">Select your favorite sport</option>
+                <option value="soccer">Soccer</option>
+                <option value="basketball">Basketball</option>
+                <option value="tennis">Tennis</option>
+                <option value="american_football">American Football</option>
+                <option value="horse_racing">Horse Racing</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="terms">
+                <input type="checkbox" id="terms" required /> I agree to the
+                Terms and Conditions
+              </label>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%">
+              Register Now
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- Advert Detail Section (initially hidden) -->
+    <section class="advert-detail" id="advert-detail">
+      <div class="container">
+        <button class="btn back-button" onclick="backToAdvertList()">
+          <i class="fas fa-arrow-left"></i> Back to Adverts
+        </button>
+
+        <div class="advert-header">
+          <h2 id="advert-detail-title">Advert Title</h2>
+          <div class="advert-meta">
+            <span
+              ><i class="far fa-calendar"></i>
+              <span id="advert-detail-date">Date</span></span
+            >
+          </div>
+        </div>
+
+        <div class="advert-full-image" id="advert-detail-image">
+          <i class="fas fa-image"></i> Advert Image
+        </div>
+
+        <div class="advert-body" id="advert-detail-content">
+          <!-- Advert content will be inserted here -->
+        </div>
+
+        <div style="text-align: center">
+          <a href="#" class="whatsapp-btn" id="whatsapp-btn" target="_blank">
+            <i class="fab fa-whatsapp"></i> Get Started on WhatsApp
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Login Form Modal -->
+    <div class="login-modal" id="login-modal">
+      <div class="login-form-container">
+        <h2 style="text-align: center; margin-bottom: 1.5rem">Admin Login</h2>
+        <form id="login-form">
+          <div class="form-group">
+            <label for="login-email">Email Address</label>
+            <input
+              type="email"
+              id="login-email"
+              class="form-control"
+              placeholder="Enter your email"
+              required />
+          </div>
+          <div class="form-group">
+            <label for="login-password">Password</label>
+            <input
+              type="password"
+              id="login-password"
+              class="form-control"
+              placeholder="Enter your password"
+              required />
+          </div>
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary" style="width: 100%">
+              Login
+            </button>
+          </div>
+          <div style="text-align: center; margin-top: 1rem">
+            <a href="#" onclick="hideLoginForm()" style="color: var(--gray)"
+              >Cancel</a
+            >
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <section class="admin-panel" id="admin-panel">
+      <div class="container">
+        <div class="admin-header">
+          <h2>Admin Dashboard</h2>
+          <button
+            class="btn btn-outline"
+            onclick="logout()"
+            id="admin-logout-btn">
+            Logout
+          </button>
+        </div>
+        <div class="admin-tabs">
+          <div class="admin-tab active" onclick="showAdminTab('adverts')">
+            Advert Management
+          </div>
+        </div>
+
+        <!-- Advert Management Tab -->
+        <div class="content-management" id="adverts-tab">
+          <div class="content-section">
+            <h3>Create New Advert</h3>
+            <div class="advert-creation">
+              <form id="advert-form" class="advert-form">
+                <div class="form-group">
+                  <label for="advert-title">Advert Title</label>
+                  <input
+                    type="text"
+                    id="advert-title"
+                    class="form-control"
+                    placeholder="Enter advert title"
+                    required />
+                </div>
+                <div class="form-group">
+                  <label for="advert-content">Advert Content</label>
+                  <textarea
+                    id="advert-content"
+                    class="form-control"
+                    placeholder="Enter the full content of your advert"
+                    rows="8"
+                    required></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="advert-excerpt"
+                    >Short Excerpt (Preview Text)</label
+                  >
+                  <textarea
+                    id="advert-excerpt"
+                    class="form-control"
+                    placeholder="Enter a short preview of your advert"
+                    rows="3"
+                    required></textarea>
+                </div>
+                <button type="submit" class="btn btn-success">
+                  Create Advert
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <div class="content-section">
+            <h3>Manage Existing Adverts</h3>
+            <div id="admin-advert-list" class="admin-list">
+              <!-- Adverts will be loaded here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h3>Dennis Moore</h3>
+            <p>
+              Providing expert betting tips and predictions to help you make
+              informed betting decisions.
+            </p>
+            <div class="social-icons">
+              <a href="#"><i class="fab fa-facebook"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+              <a href="#"><i class="fab fa-telegram"></i></a>
+            </div>
+          </div>
+          <div class="footer-section">
+            <h3>Quick Links</h3>
+            <ul class="footer-links">
+              <li><a href="#home">Home</a></li>
+              <li>
+                <a href="#results" onclick="showResultsSection(); return false;"
+                  >Results</a
+                >
+              </li>
+              <li>
+                <a href="#advert" onclick="showAdvertSection(); return false;"
+                  >Advert</a
+                >
+              </li>
+              <li><a href="#registration">Register</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h3>Contact Us</h3>
+            <ul class="footer-links">
+              <li><i class="fas fa-envelope"></i> dennismoore1957@gmail.com</li>
+              <li><i class="fas fa-phone"></i> +234 705 896 9648</li>
+              <li><i class="fas fa-map-marker-alt"></i> Nigeria</li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>
+            &copy;
+            <script>
+              document.write(new Date().getFullYear());
+            </script>
+            Dennis Moore. All rights reserved. | Please gamble responsibly.
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+  </body>
+</html>
