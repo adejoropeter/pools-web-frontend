@@ -1,10 +1,4 @@
-// Admin credentials
-const ADMIN_CREDENTIALS = {
-    email: import.meta.env.VITE_ADMIN_EMAIL,
-    password: import.meta.env.VITE_ADMIN_PASSWORD
-};
-
-const baseUrl = import.meta.env.VITE_BASE_URL;
+const baseUrl = "https://dennismoore.onrender.com";
 
 // Check if user is logged in
 function checkLoginStatus() {
@@ -40,25 +34,55 @@ function hideLoginForm() {
 }
 
 // Login function
-function login(email, password) {
-    if (email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
-        localStorage.setItem('adminLoggedIn', 'true');
-        localStorage.setItem('ADMIN_KEY', import.meta.env.VITE_ADMIN_KEY);
+async function login(email, password) {
+    try {
+        const res = await fetch(`${baseUrl}/api/admin/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+        });
+
+        if (!res.ok) throw new Error("Invalid credentials");
+
+        const data = await res.json();
+
+        // Save admin session
+        localStorage.setItem("adminLoggedIn", "true");
+        localStorage.setItem("ADMIN_KEY", data.adminKey);
+
         hideLoginForm();
         updateUIForLoginStatus();
         return true;
+    } catch (err) {
+        alert("❌ Login failed. Check email/password.");
+        console.error("Login error:", err);
+        return false;
     }
-    return false;
 }
+
 
 // Logout function
-function logout() {
-    localStorage.setItem('adminLoggedIn', 'false');
-    localStorage.removeItem('ADMIN_KEY');
+async function logout() {
+    try {
+        await fetch(`${baseUrl}/api/admin/logout`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "x-admin-key": localStorage.getItem("ADMIN_KEY") || ""
+            }
+        });
+    } catch (err) {
+        console.error("Logout request failed:", err);
+    }
+
+    // Clear session on frontend
+    localStorage.setItem("adminLoggedIn", "false");
+    localStorage.removeItem("ADMIN_KEY");
 
     updateUIForLoginStatus();
-    alert('You have been logged out successfully.');
+    alert("You have been logged out successfully.");
 }
+
 
 // Function to scroll to registration form
 function showRegistration() {
@@ -349,6 +373,7 @@ function redirectToWhatsApp(userData) {
 }
 
 // API functions for results
+document.getElementById("but").addEventListener("click", fetchAblefastResultsByDate);
 async function fetchAblefastResultsByDate() {
     const select = document.getElementById("date-select");
     const btn = document.getElementById("but");
@@ -441,7 +466,7 @@ async function loadWeeks() {
     try {
         const res = await fetch(`${baseUrl}/api/weeks`);
         if (!res.ok) throw new Error(`Failed to fetch weeks: ${res.status}`);
-        
+
         const weeks = await res.json();
 
         if (!Array.isArray(weeks)) {
