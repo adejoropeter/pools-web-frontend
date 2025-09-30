@@ -20,34 +20,18 @@
           </div>
           <div class="nav-links">
             <a href="#home">Home</a>
-            <a
-            onclick="showResultsSection(); return false;"
-            href="#results-section"
-
-              >Results</a
-            >
-            <a
-              href="#advert-preview"
-              onclick="showAdvertSection(); return false;"
-              >Advert</a
-            >
+            <a href="#results-section" id="results-link">Results</a>
+            <a href="#advert-preview" id="advert-link">Advert</a>
           </div>
           <div class="auth-buttons" id="auth-buttons">
-            <button
-              class="btn btn-outline"
-              onclick="showLoginForm()"
-              id="admin-login-btn">
+            <button class="btn btn-outline" id="admin-login-btn">
               Admin Login
             </button>
-            <button
-              class="btn btn-primary"
-              onclick="showRegistration()"
-              id="signup-btn">
+            <button class="btn btn-primary" id="signup-btn">
               Sign Up
             </button>
             <button
               class="btn btn-outline"
-              onclick="logout()"
               id="logout-btn"
               style="display: none">
               Logout
@@ -69,7 +53,7 @@
             increase their winning chances. Our experts analyze data and
             statistics to provide you with the most accurate predictions.
           </p>
-          <button class="btn btn-primary" onclick="showAdvertSection()">
+          <button class="btn btn-primary" id="cta-btn">
             Learn More
           </button>
         </div>
@@ -102,10 +86,7 @@
           <select id="date-select" class="form-control">
             <option value="latest">Latest Week</option>
           </select>
-          <button
-            class="btn btn-primary"
-            id="but"
-            >
+          <button class="btn btn-primary" id="load-results-btn">
             Load Results
           </button>
         </div>
@@ -233,7 +214,7 @@
     <!-- Advert Detail Section (initially hidden) -->
     <section class="advert-detail" id="advert-detail">
       <div class="container">
-        <button class="btn back-button" onclick="backToAdvertList()">
+        <button class="btn back-button" id="back-to-adverts-btn">
           <i class="fas fa-arrow-left"></i> Back to Adverts
         </button>
 
@@ -292,9 +273,7 @@
             </button>
           </div>
           <div style="text-align: center; margin-top: 1rem">
-            <a href="#" onclick="hideLoginForm()" style="color: var(--gray)"
-              >Cancel</a
-            >
+            <a href="#" id="cancel-login-btn" style="color: var(--gray)">Cancel</a>
           </div>
         </form>
       </div>
@@ -305,15 +284,12 @@
       <div class="container">
         <div class="admin-header">
           <h2>Admin Dashboard</h2>
-          <button
-            class="btn btn-outline"
-            onclick="logout()"
-            id="admin-logout-btn">
+          <button class="btn btn-outline" id="admin-logout-btn">
             Logout
           </button>
         </div>
         <div class="admin-tabs">
-          <div class="admin-tab active" onclick="showAdminTab('adverts')">
+          <div class="admin-tab active" id="adverts-tab-btn">
             Advert Management
           </div>
         </div>
@@ -391,16 +367,8 @@
             <h3>Quick Links</h3>
             <ul class="footer-links">
               <li><a href="#home">Home</a></li>
-              <li>
-                <a href="#results" onclick="showResultsSection(); return false;"
-                  >Results</a
-                >
-              </li>
-              <li>
-                <a href="#advert" onclick="showAdvertSection(); return false;"
-                  >Advert</a
-                >
-              </li>
+              <li><a href="#results-section" id="footer-results-link">Results</a></li>
+              <li><a href="#advert-preview" id="footer-advert-link">Advert</a></li>
               <li><a href="#registration">Register</a></li>
             </ul>
           </div>

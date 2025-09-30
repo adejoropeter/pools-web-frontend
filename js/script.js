@@ -60,7 +60,6 @@ async function login(email, password) {
     }
 }
 
-
 // Logout function
 async function logout() {
     try {
@@ -83,7 +82,6 @@ async function logout() {
     alert("You have been logged out successfully.");
 }
 
-
 // Function to scroll to registration form
 function showRegistration() {
     document.getElementById('registration').scrollIntoView({ behavior: 'smooth' });
@@ -99,7 +97,8 @@ function showResultsSection() {
 // Function to show advert section
 function showAdvertSection() {
     document.getElementById('advert-preview').scrollIntoView({ behavior: 'smooth' });
-    // loadAdverts();
+    // Load adverts when the section is shown
+    loadAdverts();
 }
 
 // Function to show specific advert detail
@@ -116,7 +115,7 @@ function showAdvertDetail(advertId) {
     document.getElementById('advert-detail').style.display = 'block';
     // Scroll to the top smoothly
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    console.log(advertId);
+    
     // Fetch the advert details from the API
     fetch(`${baseUrl}/api/adverts/${advertId}`)
         .then(response => {
@@ -150,7 +149,6 @@ function backToAdvertList() {
 
     // Hide advert detail section
     document.getElementById('advert-detail').style.display = 'none';
-
 
     // Check if admin panel should be shown
     updateUIForLoginStatus();
@@ -191,10 +189,18 @@ async function loadAdverts() {
                         <span><i class="far fa-calendar"></i> ${new Date(advert.created_at).toLocaleDateString()}</span>
                     </div>
                     <p class="advert-excerpt">${advert.excerpt}</p>
-                    <button class="btn btn-primary" onclick="showAdvertDetail('${advert.id}')">Read More</button>
+                    <button class="btn btn-primary read-more-btn" data-advert-id="${advert.id}">Read More</button>
                 </div>
             `;
             advertGrid.appendChild(advertCard);
+        });
+        
+        // Add event listeners to the newly created "Read More" buttons
+        document.querySelectorAll('.read-more-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const advertId = this.getAttribute('data-advert-id');
+                showAdvertDetail(advertId);
+            });
         });
     } catch (error) {
         console.error('Error loading adverts:', error);
@@ -231,11 +237,26 @@ async function loadAdminAdverts() {
                     <p>Published on: ${new Date(advert.created_at).toLocaleDateString()}</p>
                 </div>
                 <div>
-                    <button class="btn btn-outline edit-btn" onclick="editAdvert('${advert.id}')">Edit</button>
-                    <button class="btn btn-danger" onclick="deleteAdvert('${advert.id}')">Delete</button>
+                    <button class="btn btn-outline edit-btn" data-advert-id="${advert.id}">Edit</button>
+                    <button class="btn btn-danger delete-btn" data-advert-id="${advert.id}">Delete</button>
                 </div>
             `;
             adminAdvertList.appendChild(advertItem);
+        });
+        
+        // Add event listeners to edit and delete buttons
+        document.querySelectorAll('.edit-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const advertId = this.getAttribute('data-advert-id');
+                editAdvert(advertId);
+            });
+        });
+        
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const advertId = this.getAttribute('data-advert-id');
+                deleteAdvert(advertId);
+            });
         });
     } catch (error) {
         console.error('Error loading admin adverts:', error);
@@ -274,7 +295,7 @@ async function createAdvert(event) {
         });
 
         if (!response.ok) throw new Error('Failed to create advert');
-        console.log(response)
+
         // Reset form
         document.getElementById('advert-form').reset();
 
@@ -338,7 +359,6 @@ async function deleteAdvert(advertId) {
         loadAdminAdverts();
         showAdvertSection();
 
-
         alert('Advert deleted successfully!');
     } catch (error) {
         console.error('Error deleting advert:', error);
@@ -373,10 +393,9 @@ function redirectToWhatsApp(userData) {
 }
 
 // API functions for results
-document.getElementById("but").addEventListener("click", fetchAblefastResultsByDate);
 async function fetchAblefastResultsByDate() {
     const select = document.getElementById("date-select");
-    const btn = document.getElementById("but");
+    const btn = document.getElementById("load-results-btn");
     const date = select.value.split("/").pop();
 
     let url = `${baseUrl}/api/fixtures`;
@@ -388,10 +407,10 @@ async function fetchAblefastResultsByDate() {
     try {
         const res = await fetch(url);
         const data = await res.json();
-        btn.textContent = "Load Result"
+        btn.textContent = "Load Results"
         renderResults(data);
     } catch (err) {
-        btn.textContent = "Load Result"
+        btn.textContent = "Load Results"
         console.error("❌ Failed to fetch results:", err);
         document.getElementById("results-body").innerHTML = `<tr><td colspan="5">Error fetching results.</td></tr>`;
     }
@@ -460,8 +479,6 @@ async function fetchAblefastResults() {
     }
 }
 
-
-
 async function loadWeeks() {
     try {
         const res = await fetch(`${baseUrl}/api/weeks`);
@@ -490,6 +507,55 @@ async function loadWeeks() {
     }
 }
 
+// Update an existing advert
+async function updateAdvert(event, advertId) {
+    event.preventDefault();
+
+    const title = document.getElementById('advert-title').value;
+    const content = document.getElementById('advert-content').value;
+    const excerpt = document.getElementById('advert-excerpt').value;
+
+    if (!title || !content || !excerpt) {
+        alert('Please fill in all fields');
+        return;
+    }
+
+    const updatedAdvert = {
+        title,
+        content,
+        excerpt
+    };
+
+    try {
+        const response = await fetch(`${baseUrl}/api/adverts/${advertId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-admin-key': localStorage.getItem('ADMIN_KEY') || "" // ✅ include admin key
+            },
+            body: JSON.stringify(updatedAdvert)
+        });
+
+        if (!response.ok) throw new Error('Failed to update advert');
+
+        // Reset form and remove edit mode
+        const form = document.getElementById('advert-form');
+        form.reset();
+        delete form.dataset.editId;
+        form.querySelector('button[type="submit"]').textContent = 'Create Advert';
+
+        // Reload adverts
+        loadAdverts();
+        loadAdminAdverts();
+
+        showAdvertSection();
+
+        alert('Advert updated successfully!');
+    } catch (error) {
+        console.error('Error updating advert:', error);
+        alert('Failed to update advert. Please try again.');
+    }
+}
 
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', function () {
@@ -552,55 +618,41 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Ensure advert detail section is hidden on initial load
     document.getElementById('advert-detail').style.display = 'none';
+
+    // Add event listeners to all buttons and links
+    
+    // Admin login button
+    document.getElementById('admin-login-btn').addEventListener('click', showLoginForm);
+    
+    // Sign up button
+    document.getElementById('signup-btn').addEventListener('click', showRegistration);
+    
+    // Logout buttons
+    document.getElementById('logout-btn').addEventListener('click', logout);
+    document.getElementById('admin-logout-btn').addEventListener('click', logout);
+    
+    // Results links
+    document.getElementById('results-link').addEventListener('click', showResultsSection);
+    document.getElementById('footer-results-link').addEventListener('click', showResultsSection);
+    
+    // Advert links
+    document.getElementById('advert-link').addEventListener('click', showAdvertSection);
+    document.getElementById('footer-advert-link').addEventListener('click', showAdvertSection);
+    
+    // CTA button
+    document.getElementById('cta-btn').addEventListener('click', showAdvertSection);
+    
+    // Back to adverts button
+    document.getElementById('back-to-adverts-btn').addEventListener('click', backToAdvertList);
+    
+    // Cancel login button
+    document.getElementById('cancel-login-btn').addEventListener('click', hideLoginForm);
+    
+    // Load results button
+    document.getElementById('load-results-btn').addEventListener('click', fetchAblefastResultsByDate);
+    
+    // Admin tab button
+    document.getElementById('adverts-tab-btn').addEventListener('click', function() {
+        showAdminTab('adverts');
+    });
 });
-
-// Update an existing advert
-async function updateAdvert(event, advertId) {
-    event.preventDefault();
-
-    const title = document.getElementById('advert-title').value;
-    const content = document.getElementById('advert-content').value;
-    const excerpt = document.getElementById('advert-excerpt').value;
-
-    if (!title || !content || !excerpt) {
-        alert('Please fill in all fields');
-        return;
-    }
-
-    const updatedAdvert = {
-        title,
-        content,
-        excerpt
-    };
-
-    try {
-        const response = await fetch(`${baseUrl}/api/adverts/${advertId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-admin-key': localStorage.getItem('ADMIN_KEY') || "" // ✅ include admin key
-            },
-            body: JSON.stringify(updatedAdvert)
-        });
-
-        if (!response.ok) throw new Error('Failed to update advert');
-
-        // Reset form and remove edit mode
-        const form = document.getElementById('advert-form');
-        form.reset();
-        delete form.dataset.editId;
-        form.querySelector('button[type="submit"]').textContent = 'Create Advert';
-
-        // Reload adverts
-        loadAdverts();
-        loadAdminAdverts();
-
-        showAdvertSection();
-
-
-        alert('Advert updated successfully!');
-    } catch (error) {
-        console.error('Error updating advert:', error);
-        alert('Failed to update advert. Please try again.');
-    }
-}
