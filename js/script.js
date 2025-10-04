@@ -403,8 +403,9 @@ async function fetchAblefastResultsByDate() {
     if (date !== "latest") {
         url = `${baseUrl}/api/fixtures/${date}`;
     }
+    btn.disabled = true
     btn.textContent = "Loading..."
-console.log("Fetching results from:" );
+    console.log("Fetching results from:");
     try {
         const res = await fetch(url);
         const data = await res.json();
@@ -415,6 +416,9 @@ console.log("Fetching results from:" );
         btn.textContent = "Load Results"
         console.error("❌ Failed to fetch results:", err);
         document.getElementById("results-body").innerHTML = `<tr><td colspan="5">Error fetching results.</td></tr>`;
+    }finally {
+        btn.disabled = false;
+        btn.textContent = "Load Results";
     }
 }
 
@@ -431,16 +435,22 @@ function renderResults(data) {
             const isDraw = f.result && f.result.toLowerCase().includes("draw");
             const scoreline = (f.homeScore !== undefined && f.awayScore !== undefined)
                 ? `(${f.homeScore}) x (${f.awayScore})`
-                : "";
+                : "li";
             return `<tr>
-                <td>${f.number}</td>
-                <td>${f.home}</td>
-            <td class="scoreline">${scoreline}</td>
-            <td>${f.away}</td>
-            <td class="${isDraw ? "draw-result" : ""}">${f.result || "Pending"}</td>
-            <td>${f.status || "—"}</td>
-
-            </tr>`;
+  <td>${f.number}</td>
+  <td>${f.home}</td>
+  <td class="scoreline">
+    <div class="scoreline-flex">
+      <span>${f.homeScore !== null ? `(${f.homeScore})` : ""}</span>
+      ${f.homeScore !== null && f.awayScore !== null ? `<span class="separator">x</span>` : ""}
+      <span>${f.awayScore !== null ? `(${f.awayScore})` : ""}</span>
+    </div>
+  </td>
+  <td>${f.away}</td>
+  <td class="${isDraw ? "draw-result" : ""}">${f.result || "Pending"}</td>
+  <td>${f.status || "—"}</td>
+</tr>
+`;
         })
         .join("");
 }
@@ -500,24 +510,28 @@ async function loadWeeks() {
 
         if (!Array.isArray(weeks)) {
             console.error("❌ Invalid weeks response:", weeks);
-            return; // prevent crashing
+            return;
         }
 
         const select = document.getElementById("date-select");
-        select.innerHTML = '<option value="latest">Latest Week</option>';
+        select.innerHTML = ''; // clear existing
 
-        weeks.forEach(week => {
+        weeks.forEach((week, i) => {
             const option = document.createElement("option");
             option.value = week.date;
             option.textContent = week.label;
+            if (i === 0) option.selected = true; // mark first as latest
             select.appendChild(option);
         });
+
+        return weeks; // ✅ return so DOMContentLoaded can use it
     } catch (err) {
         console.error("Failed to load weeks:", err);
         const select = document.getElementById("date-select");
         select.innerHTML = '<option value="error">Error loading weeks</option>';
     }
 }
+
 
 // Update an existing advert
 async function updateAdvert(event, advertId) {
@@ -578,10 +592,16 @@ document.addEventListener('DOMContentLoaded', function () {
     loadAdverts();
 
     // Load weeks for results
-    loadWeeks();
+    // loadWeeks();
 
     // Fetch initial results
-    fetchAblefastResults();
+    loadWeeks().then(() => {
+        const select = document.getElementById("date-select");
+        if (select && select.options.length > 0) {
+            select.selectedIndex = 0; // select first (latest)
+            fetchAblefastResultsByDate(); // fetch fixtures for latest
+        }
+    });
 
     // Form submission handler
     document.getElementById('registration-form').addEventListener('submit', function (e) {

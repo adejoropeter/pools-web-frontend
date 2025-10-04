@@ -471,10 +471,24 @@ textarea.form-control {
   color: red !important;
   font-weight: bold;
 }
-.scoreline {
-  font-weight: bold;
-  color: red !important;
+.scoreline-flex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;            /* spacing between items */
+  white-space: nowrap; /* prevents wrapping on smaller screens */
 }
+
+.scoreline-flex span {
+  font-weight: bold;
+  color: red;
+}
+
+.scoreline-flex .separator {
+  color: black; /* make 'x' more distinct */
+  font-weight: 600;
+}
+
 
 /* Loading & Error States */
 .results-table .loading,
