@@ -35,11 +35,12 @@ function hideLoginForm() {
 
 // Login function
 async function login(email, password) {
+    console.log({ email, password })
     try {
         const res = await fetch(`${baseUrl}/api/admin/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify({ email: email.toLowerCase(), password: password.toLowerCase() })
         });
 
         if (!res.ok) throw new Error("Invalid credentials");
@@ -115,7 +116,7 @@ function showAdvertDetail(advertId) {
     document.getElementById('advert-detail').style.display = 'block';
     // Scroll to the top smoothly
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    
+
     // Fetch the advert details from the API
     fetch(`${baseUrl}/api/adverts/${advertId}`)
         .then(response => {
@@ -194,10 +195,10 @@ async function loadAdverts() {
             `;
             advertGrid.appendChild(advertCard);
         });
-        
+
         // Add event listeners to the newly created "Read More" buttons
         document.querySelectorAll('.read-more-btn').forEach(button => {
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function () {
                 const advertId = this.getAttribute('data-advert-id');
                 showAdvertDetail(advertId);
             });
@@ -243,17 +244,17 @@ async function loadAdminAdverts() {
             `;
             adminAdvertList.appendChild(advertItem);
         });
-        
+
         // Add event listeners to edit and delete buttons
         document.querySelectorAll('.edit-btn').forEach(button => {
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function () {
                 const advertId = this.getAttribute('data-advert-id');
                 editAdvert(advertId);
             });
         });
-        
+
         document.querySelectorAll('.delete-btn').forEach(button => {
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function () {
                 const advertId = this.getAttribute('data-advert-id');
                 deleteAdvert(advertId);
             });
@@ -403,12 +404,13 @@ async function fetchAblefastResultsByDate() {
         url = `${baseUrl}/api/fixtures/${date}`;
     }
     btn.textContent = "Loading..."
-
+console.log("Fetching results from:" );
     try {
         const res = await fetch(url);
         const data = await res.json();
         btn.textContent = "Load Results"
         renderResults(data);
+        console.log(data)
     } catch (err) {
         btn.textContent = "Load Results"
         console.error("❌ Failed to fetch results:", err);
@@ -427,12 +429,17 @@ function renderResults(data) {
     resultsBody.innerHTML = data.fixtures
         .map((f, i) => {
             const isDraw = f.result && f.result.toLowerCase().includes("draw");
+            const scoreline = (f.homeScore !== undefined && f.awayScore !== undefined)
+                ? `(${f.homeScore}) x (${f.awayScore})`
+                : "";
             return `<tr>
-                <td>${i + 1}</td>
+                <td>${f.number}</td>
                 <td>${f.home}</td>
-                <td>${f.away}</td>
-                <td class="${isDraw ? "draw-result" : ""}">${f.result || "Pending"}</td> 
-                <td>${f.status || "—"}</td>
+            <td class="scoreline">${scoreline}</td>
+            <td>${f.away}</td>
+            <td class="${isDraw ? "draw-result" : ""}">${f.result || "Pending"}</td>
+            <td>${f.status || "—"}</td>
+
             </tr>`;
         })
         .join("");
@@ -455,7 +462,6 @@ async function fetchAblefastResults() {
 
         const fixtures = data.fixtures.fixtures;
         resultsBody.innerHTML = "";
-
         if (fixtures.length === 0) {
             resultsBody.innerHTML = '<tr><td colspan="5" class="loading">No results available</td></tr>';
             return;
@@ -464,13 +470,19 @@ async function fetchAblefastResults() {
         fixtures.forEach((fixture) => {
             const isDraw = fixture.result && fixture.result.toLowerCase().includes("draw");
             const row = document.createElement("tr");
+            const scoreline = (fixture.home_score !== undefined && fixture.away_score !== undefined)
+                ? `(${fixture.home_score}) x (${fixture.away_score})`
+                : "";
+
             row.innerHTML = `
-                <td>${fixture.number}</td>
-                <td>${fixture.home}</td>
-                <td>${fixture.away}</td>
-                <td class="${isDraw ? "draw-result" : ""}">${fixture.result || "-"}</td>
-                <td>${fixture.status || "Pending"}</td>
-            `;
+    <td>${fixture.number}</td>
+    <td>${fixture.home}</td>
+    <td>${scoreline}</td>
+    <td>${fixture.away}</td>
+    <td class="${isDraw ? "draw-result" : ""}">${fixture.result || "-"}</td>
+    <td>${fixture.status || "Pending"}</td>
+`;
+
             resultsBody.appendChild(row);
         });
     } catch (error) {
@@ -620,39 +632,39 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('advert-detail').style.display = 'none';
 
     // Add event listeners to all buttons and links
-    
+
     // Admin login button
     document.getElementById('admin-login-btn').addEventListener('click', showLoginForm);
-    
+
     // Sign up button
     document.getElementById('signup-btn').addEventListener('click', showRegistration);
-    
+
     // Logout buttons
     document.getElementById('logout-btn').addEventListener('click', logout);
     document.getElementById('admin-logout-btn').addEventListener('click', logout);
-    
+
     // Results links
     document.getElementById('results-link').addEventListener('click', showResultsSection);
     document.getElementById('footer-results-link').addEventListener('click', showResultsSection);
-    
+
     // Advert links
     document.getElementById('advert-link').addEventListener('click', showAdvertSection);
     document.getElementById('footer-advert-link').addEventListener('click', showAdvertSection);
-    
+
     // CTA button
     document.getElementById('cta-btn').addEventListener('click', showAdvertSection);
-    
+
     // Back to adverts button
     document.getElementById('back-to-adverts-btn').addEventListener('click', backToAdvertList);
-    
+
     // Cancel login button
     document.getElementById('cancel-login-btn').addEventListener('click', hideLoginForm);
-    
+
     // Load results button
     document.getElementById('load-results-btn').addEventListener('click', fetchAblefastResultsByDate);
-    
+
     // Admin tab button
-    document.getElementById('adverts-tab-btn').addEventListener('click', function() {
+    document.getElementById('adverts-tab-btn').addEventListener('click', function () {
         showAdminTab('adverts');
     });
 });

@@ -471,6 +471,10 @@ textarea.form-control {
   color: red !important;
   font-weight: bold;
 }
+.scoreline {
+  font-weight: bold;
+  color: red !important;
+}
 
 /* Loading & Error States */
 .results-table .loading,
@@ -729,13 +733,13 @@ footer {
   .admin-tabs {
     flex-direction: column;
   }
-  .container{
+  .container {
     padding: 0 5px;
   }
-  .admin-panel{
+  .admin-panel {
     padding: 0.5rem;
   }
-  footer{
+  footer {
     padding: 3rem 1rem 1rem 1rem;
   }
 }
